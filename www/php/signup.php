@@ -1,67 +1,47 @@
 <?php
 session_start();
 
-// Connexion à la base de données
-$host = 'mysql';  
-$dbname = 'mydb';
-$username = 'root';
-$password = 'root';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    die("Erreur de connexion à la base de données.");
-}
-
-// READ ////////////////////////////////
-try {
-    $stmt = $pdo->prepare("SELECT id, first_name, last_name, email, role FROM User");
-    $stmt->execute();
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    $users = [];
-}
+require_once "db.php";
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="./css/signup.php">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Gestion des utilisateurs</title>
 </head>
-<body>
+<body class="h-screen bg-gray-200 flex items-center justify-center flex-col">
 
-<h2>Inscription</h2>
+<h2 class="flex justify-center text-3xl mt-20">Inscription</h2>
 
 <?php
 if (isset($_SESSION['error'])) {
-    echo "<p style='color:red'>" . $_SESSION['error'] . "</p>";
+    echo "<p class='flex justify-center text-red-500 mt-6'>" . $_SESSION['error'] . "</p>";
     unset($_SESSION['error']);
 }
 ?>
 
-<form method="post" action="signup_traitement.php">
+<form method="post" action="signup_traitement.php" class="flex flex-col mt-12 items-center h-screen">
     <label for="first_name">Prénom:</label>
-    <input type="text" id="first_name" name="first_name" required><br>
+    <input type="text" id="first_name" name="first_name" required class="border border-black w-64"><br>
 
     <label for="last_name">Nom:</label>
-    <input type="text" id="last_name" name="last_name" required><br>
+    <input type="text" id="last_name" name="last_name" required class="border border-black w-64"><br>
 
     <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required><br>
+    <input type="email" id="email" name="email" required class="border border-black w-64"><br>
 
     <label for="password">Mot de passe:</label>
-    <input type="password" id="password" name="password" required><br>
+    <input type="password" id="password" name="password" required class="border border-black w-64"><br>
 
     <label for="role">Rôle:</label>
-    <select id="role" name="role">
+    <select id="role" name="role" class="border border-black w-64">
         <option value="member">Membre</option>
         <option value="admin">Admin</option>
     </select><br>
 
-    <input type="submit" value="S'inscrire">
+    <input type="submit" value="S'inscrire" class="bg-gray-300 px-6 py-2 rounded hover:bg-gray-700 hover:text-white active:bg-gray-900">
 </form>
 </body>
 </html>

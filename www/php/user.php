@@ -1,6 +1,6 @@
 <?php
 
-require "signup.php";
+require_once "db.php";
 
 ?>
 

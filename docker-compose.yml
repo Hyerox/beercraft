@@ -5,7 +5,7 @@ services:
     image: php:8.2-apache
     container_name: apache_container
     ports:
-      - "8080:80"
+      - '8080:80'
     volumes:
       - ./www:/var/www/html
     depends_on:
@@ -16,7 +16,7 @@ services:
     image: mysql:8.0
     container_name: mysql_container
     ports:
-      - "3306:3306"
+      - '3306:3306'
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydb
@@ -30,7 +30,7 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin_container
     ports:
-      - "8081:80"
+      - '8081:80'
     environment:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: root

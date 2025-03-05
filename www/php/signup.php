@@ -13,7 +13,7 @@ require_once "db.php";
     <title>Gestion des utilisateurs</title>
 </head>
 
-<body class="h-screen bg-gray-200 flex items-center justify-center flex-col">
+<body style="background-image: url('../images/beer_bg.jpg');" class="h-screen bg-cover bg-center bg-gray-200 flex items-center justify-center flex-col">
 
     <h2 class="flex justify-center text-3xl mt-20">Inscription</h2>
 

@@ -22,3 +22,12 @@ try {
     echo "Erreur SQL : " . $e->getMessage();
     $users = [];
 }
+
+try {
+    $stmt = $pdo->prepare("SELECT * FROM Beer");
+    $stmt->execute();
+    $beers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erreur SQL : " . $e->getMessage();
+    $beers = [];
+}

@@ -1,14 +1,25 @@
 <?php
-
 session_start();
 require_once "db.php";
 
-// Vérification si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
   header('Location: login.php');
   exit;
 }
 
+if (!isset($_GET['id'])) {
+  header('Location: tab.php');
+  exit;
+}
+
+$stmt = $pdo->prepare("SELECT * FROM Beer WHERE id = ?");
+$stmt->execute([$_GET['id']]);
+$beer = $stmt->fetch();
+
+if (!$beer) {
+  header('Location: tab.php');
+  exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,62 +29,68 @@ if (!isset($_SESSION['user_id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-  <title>Ajout de bière</title>
+  <title>Modifier la bière</title>
   <script>
     function updatePreview() {
+      // Même fonction que dans add_beer.php
       document.getElementById('preview_name').innerText = capitalizeFirstLetter(document.getElementById('beer_name').value);
       document.getElementById('preview_origin').innerText = capitalizeFirstLetter(document.getElementById('origin').value);
       document.getElementById('preview_alcohol').innerText = document.getElementById('alcohol').value + '%';
       document.getElementById('preview_description').innerText = capitalizeFirstLetter(document.getElementById('description').value);
       document.getElementById('preview_price').innerText = document.getElementById('price').value + '€';
 
-      // Récupérer l'URL de l'image entrée
       let imageUrl = document.getElementById('image').value;
       let imagePreview = document.getElementById('preview_image');
-
       if (imageUrl) {
         imagePreview.src = imageUrl;
         imagePreview.style.display = 'block';
       } else {
         imagePreview.src = "";
-        imagePreview.style.display = 'none'; // Cacher l'image si aucun URL n'est entré
+        imagePreview.style.display = 'none';
       }
+    }
+
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
     }
   </script>
 </head>
 
 <body style="background-image: url('../images/beer_bg.jpg');" class="h-screen bg-cover bg-no-repeat bg-center flex items-center">
-
   <div class="flex justify-around w-full">
     <div class="w-1/2 flex justify-center">
       <div class="bg-stone-500/80 text-white flex flex-col w-3/4 items-center rounded-xl py-6">
-        <h3 class="text-3xl mb-4">Ajout d'une bière</h3>
-        <form action="add_beer_traitement.php" method="post" class="flex flex-col items-center w-full">
+        <h3 class="text-3xl mb-4">Modifier la bière</h3>
+        <form action="edit_beer_traitement.php" method="post" class="flex flex-col items-center w-full">
+          <input type="hidden" name="id" value="<?= $beer['id'] ?>">
+
           <label for="image" class="text-lg mb-2">Image</label>
-          <input type="text" id="image" name="image" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" placeholder="Entrez l'URL de l'image" oninput="updatePreview()">
+          <input type="text" id="image" name="image" value="<?= htmlspecialchars($beer['image']) ?>" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" oninput="updatePreview()">
 
           <label for="beer_name" class="text-lg mb-2">Nom de la bière</label>
-          <input type="text" id="beer_name" name="beer_name" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
+          <input type="text" id="beer_name" name="beer_name" value="<?= htmlspecialchars($beer['name']) ?>" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
 
           <label for="origin" class="text-lg mb-2">Origine</label>
-          <input type="text" id="origin" name="origin" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
+          <input type="text" id="origin" name="origin" value="<?= htmlspecialchars($beer['origin']) ?>" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
 
           <label for="alcohol" class="text-lg mb-2">% Alcool</label>
-          <input type="number" step=".01" min="0" id="alcohol" name="alcohol" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
+          <input type="number" step=".01" min="0" id="alcohol" name="alcohol" value="<?= htmlspecialchars($beer['alcohol']) ?>" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
 
           <label for="price" class="text-lg mb-2">Prix</label>
-          <input type="number" step=".01" min="0" id="price" name="price" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
+          <input type="number" step=".01" min="0" id="price" name="price" value="<?= htmlspecialchars($beer['average_price']) ?>" class="border border-black w-64 bg-white text-black rounded-lg mb-4 min-h-[28px]" required oninput="updatePreview()">
 
           <label for="description" class="text-lg mb-2">Description</label>
-          <textarea id="description" name="description" cols="10" rows="7" class="border border-gray-500 bg-white text-black placeholder:text-black p-2 rounded-lg resize-none w-64 mb-4" placeholder="Entrez une description détaillée de la bière..." required oninput="updatePreview()"></textarea>
+          <textarea id="description" name="description" class="border border-gray-500 bg-white text-black placeholder:text-black p-2 rounded-lg resize-none w-64 mb-4" required oninput="updatePreview()"><?= htmlspecialchars($beer['description']) ?></textarea>
 
-
-
-          <input type="submit" value="Ajouter" class="bg-gray-500 px-6 py-2 border border-black rounded-lg hover:bg-gray-700 hover:text-white active:bg-gray-900 transition duration-200">
+          <div class="flex gap-4">
+            <input type="submit" value="Modifier" class="bg-blue-500 px-6 py-2 border border-black rounded-lg hover:bg-blue-700 hover:text-white active:bg-blue-900 transition duration-200">
+            <a href="tab.php" class="bg-gray-500 px-6 py-2 border border-black rounded-lg hover:bg-gray-700 hover:text-white active:bg-gray-900 transition duration-200">Annuler</a>
+          </div>
         </form>
       </div>
     </div>
 
+    <!-- Même prévisualisation que dans add_beer.php -->
     <div class="w-1/2 flex justify-center my-auto">
       <div class="bg-stone-500/80 text-white w-96 rounded-xl p-6 flex flex-col">
         <h3 class="text-2xl mb-4 text-center">Prévisualisation de la carte</h3>
@@ -81,8 +98,8 @@ if (!isset($_SESSION['user_id'])) {
         <!-- Card Preview -->
         <div class="bg-white text-black rounded-lg overflow-hidden shadow-lg">
           <!-- Image Container -->
-          <div class="w-full h-48 overflow-hidden bg-black">
-            <img id="preview_image" src="https://images.unsplash.com/photo-1608270586620-248524c67de9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8YmVlcnxlbnwwfHwwfHx8MA%3D%3D" alt="Image de la bière"
+          <div class="w-full h-48 overflow-hidden bg-gray-100">
+            <img id="preview_image" src="<?= htmlspecialchars($beer['image']) ?>" alt="Image de la bière"
               class="w-full h-full object-contain">
           </div>
 
@@ -126,7 +143,12 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
   </div>
-
+  <script>
+    // Initialiser la prévisualisation au chargement
+    window.onload = function() {
+      updatePreview();
+    };
+  </script>
 </body>
 
 </html>

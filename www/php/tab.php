@@ -149,6 +149,7 @@ if (isset($_POST['update'])) {
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-400"><?= htmlspecialchars($beer['created_at']) ?></td>
                             <td class="px-6 py-4">
+                                <a href="edit_beer.php?id=<?= $beer['id'] ?>" class="bg-blue-500/30 hover:bg-blue-500/50 px-3 py-1 rounded-lg text-sm transition-all duration-300 mr-2">Modifier</a>
                                 <form method="post" action="" class="inline">
                                     <input type="hidden" name="id" value="<?= $beer['id'] ?>">
                                     <input type="hidden" name="delete_type" value="beer">

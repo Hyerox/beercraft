@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "db.php";
+require_once __DIR__ . "/db.php";
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -52,10 +52,10 @@ Cordialement,`);
     </style>
 </head>
 
-<body style="background-image: url('../images/beer_bg.jpg');" class="bg-cover bg-center h-screen bg-fixed">
+<body style="background-image: url('../../images/beer_bg.jpg');" class="bg-cover bg-center h-screen bg-fixed">
 
     <div class="w-full flex justify-between items-center px-8">
-        <img src="../images/Logo-beercraft-removebg-preview.png" class="w-32 h-32 object-center brightness-50 saturate-200">
+        <img src="../../images/Logo-beercraft-removebg-preview.png" class="w-32 h-32 object-center brightness-50 saturate-200">
 
         <div class="text-center">
             <h1 class="text-4xl">Beercraft</h1>
@@ -69,13 +69,13 @@ Cordialement,`);
     <div class="absolute top-0 right-0 mt-4 mr-4 text-white">
         <?php if (!isset($_SESSION['user_id'])): ?>
             <nav class="flex gap-2">
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="login.php">Se connecter</a></li>
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="signup.php">S'inscrire</a></li>
+                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./login.php">Se connecter</a></li>
+                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./signup.php">S'inscrire</a></li>
             </nav>
         <?php else: ?>
             <nav class="flex gap-2">
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="add_beer.php">Ajoutez des bières</a></li>
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="logout.php">Se déconnecter</a></li>
+                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./add_beer.php">Ajoutez des bières</a></li>
+                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./logout.php">Se déconnecter</a></li>
             </nav>
         <?php endif; ?>
     </div>
@@ -130,12 +130,12 @@ Cordialement,`);
                                         <p class="text-gray-600 text-sm mb-2">
                                             Origine: <span class="font-medium"><?= htmlspecialchars($beer['origin']) ?></span>
                                         </p>
-                                        <p class="text-gray-700 text-sm line-clamp-2">
+                                        <p class="text-gray-700 text-sm line-clamp-2 mb-2">
                                             <?= nl2br(htmlspecialchars($beer['description'])) ?>
                                         </p>
-                                        <button class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors">
+                                        <a href="./info_beer.php?id=<?= htmlspecialchars($beer['id']) ?>" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
                                             Voir détails
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -208,9 +208,9 @@ Cordialement,`);
 
                             <!-- Action Buttons -->
                             <div class="mt-4 flex justify-between items-center">
-                                <button class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors">
+                                <a href="./info_beer.php?id=<?= htmlspecialchars($beer['id']) ?>" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors">
                                     Voir détails
-                                </button>
+                                </a>
                                 <div class="flex items-center gap-2">
                                     <button class="text-gray-600 hover:text-amber-500">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

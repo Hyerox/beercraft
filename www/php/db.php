@@ -32,6 +32,7 @@ try {
     $beers = [];
 }
 
+
 ?>
 <script>
     function capitalizeFirstLetter(string) {

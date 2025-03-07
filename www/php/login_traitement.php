@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 session_start();
 
@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';
-        
+
         if (!$email || empty($password)) {
             throw new Exception("Tous les champs sont obligatoires.");
         }
@@ -35,4 +35,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 }
-?>

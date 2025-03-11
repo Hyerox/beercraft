@@ -1,6 +1,88 @@
 <?php
 session_start();
 require_once __DIR__ . "/db.php";
+
+// Configuration de la pagination
+$beers_per_page = 12;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$selected_category = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+$selected_origin = isset($_GET['origin']) ? $_GET['origin'] : '';
+
+try {
+    // Récupération des origines uniques
+    $stmt = $pdo->query("SELECT DISTINCT origin FROM Beer WHERE origin IS NOT NULL ORDER BY origin");
+    $origins = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    // Récupération des catégories
+    $stmt = $pdo->query("SELECT * FROM Category ORDER BY name");
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Compter le nombre total de bières avec filtres
+    $countQuery = "SELECT COUNT(DISTINCT b.id) as total FROM Beer b";
+    $whereConditions = [];
+    $params = [];
+
+    if ($selected_category > 0) {
+        $countQuery .= " JOIN Beer_Category bc ON b.id = bc.beer_id";
+        $whereConditions[] = "bc.category_id = :category";
+        $params[':category'] = $selected_category;
+    }
+
+    if ($selected_origin) {
+        $whereConditions[] = "b.origin = :origin";
+        $params[':origin'] = $selected_origin;
+    }
+
+    if (!empty($whereConditions)) {
+        $countQuery .= " WHERE " . implode(' AND ', $whereConditions);
+    }
+
+    $stmt = $pdo->prepare($countQuery);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $total_beers = (int)$result['total'];
+    $total_pages = ceil($total_beers / $beers_per_page);
+
+    // Vérifier que la page courante est valide
+    if ($current_page < 1) $current_page = 1;
+    if ($current_page > $total_pages) $current_page = $total_pages;
+
+    // Calculer l'offset
+    $offset = ($current_page - 1) * $beers_per_page;
+
+    // Récupération des bières avec filtres
+    $query = "SELECT DISTINCT b.* FROM Beer b";
+    if ($selected_category > 0) {
+        $query .= " JOIN Beer_Category bc ON b.id = bc.beer_id";
+    }
+
+    if (!empty($whereConditions)) {
+        $query .= " WHERE " . implode(' AND ', $whereConditions);
+    }
+
+    $query .= " ORDER BY b.origin, b.created_at DESC LIMIT :limit OFFSET :offset";
+
+    $stmt = $pdo->prepare($query);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    $stmt->bindValue(':limit', $beers_per_page, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $beers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    error_log("Pagination: Total={$total_beers}, Pages={$total_pages}, Current={$current_page}, Offset={$offset}");
+} catch (PDOException $e) {
+    error_log($e->getMessage());
+    $beers = [];
+    $total_pages = 1;
+    $total_beers = 0;
+}
+
+include_once "./includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -30,6 +112,27 @@ Cordialement,`);
         }
 
         function capitalizeFirstLetter(string) {
+            if (!string) return '-';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function partager() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: "Découvrez cette page !",
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Partage réussi');
+                }).catch((error) => {
+                    console.error('Erreur de partage :', error);
+                });
+            } else {
+                alert("Le partage n'est pas pris en charge sur ce navigateur.");
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
     </script>
@@ -53,33 +156,6 @@ Cordialement,`);
 </head>
 
 <body style="background-image: url('../../images/beer_bg.jpg');" class="bg-cover bg-center h-screen bg-fixed">
-
-    <div class="w-full flex justify-between items-center px-8">
-        <img src="../../images/Logo-beercraft-removebg-preview.png" class="w-32 h-32 object-center brightness-50 saturate-200">
-
-        <div class="text-center">
-            <h1 class="text-4xl">Beercraft</h1>
-            <h2 class="italic text-2xl">Chaque bière a une histoire, partagez la vôtre !</h2>
-        </div>
-
-        <div class="w-40"></div>
-    </div>
-
-    <!-- Navigation en haut à droite -->
-    <div class="absolute top-0 right-0 mt-4 mr-4 text-white">
-        <?php if (!isset($_SESSION['user_id'])): ?>
-            <nav class="flex gap-2">
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./login.php">Se connecter</a></li>
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./signup.php">S'inscrire</a></li>
-            </nav>
-        <?php else: ?>
-            <nav class="flex gap-2">
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./add_beer.php">Ajoutez des bières</a></li>
-                <li class="bg-gray-700 list-none py-2 px-4 rounded-xl hover:bg-gray-800 active:bg-black"><a href="./logout.php">Se déconnecter</a></li>
-            </nav>
-        <?php endif; ?>
-    </div>
-
     <div class="flex justify-around">
         <div class="text-white p-4 bg-black bg-opacity-40 rounded-lg w-1/4">
             <article class="flex flex-col items-center text-white">
@@ -128,12 +204,12 @@ Cordialement,`);
                                             </div>
                                         </div>
                                         <p class="text-gray-600 text-sm mb-2">
-                                            Origine: <span class="font-medium"><?= htmlspecialchars($beer['origin']) ?></span>
+                                            Origine: <span class="font-medium"><?= ucfirst(htmlspecialchars($beer['origin'])) ?></span>
                                         </p>
                                         <p class="text-gray-700 text-sm line-clamp-2 mb-2">
                                             <?= nl2br(htmlspecialchars($beer['description'])) ?>
                                         </p>
-                                        <a href="./info_beer.php?id=<?= htmlspecialchars($beer['id']) ?>" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
+                                        <a href="./info_beer_comment.php?id=<?= htmlspecialchars($beer['id']) ?>" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors cursor-pointer">
                                             Voir détails
                                         </a>
                                     </div>
@@ -160,17 +236,29 @@ Cordialement,`);
         </div>
     </div>
 
-    <?php
-    try {
-        $stmt = $pdo->query("SELECT * FROM Beer ORDER BY created_at DESC");
-        $beers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        echo "Erreur de lecture : " . $e->getMessage();
-    }
-    ?>
+    <!-- Ajouter les filtres avant la grille des bières -->
+    <div class="container mx-auto p-8">
+        <div class="mb-6 bg-black/30 backdrop-blur-sm rounded-xl">
+            <form action="" method="GET" class="flex items-center justify-center gap-4 p-6">
+                <div class="flex items-center gap-4">
+                    <label for="origin" class="text-white">Type :</label>
+                    <select name="origin" id="origin" class="rounded-lg px-4 py-2 bg-amber-500/80 text-white">
+                        <option value="">Toutes les origines</option>
+                        <?php foreach ($origins as $origin): ?>
+                            <option value="<?= htmlspecialchars($origin) ?>"
+                                <?= $selected_origin === $origin ? 'selected' : '' ?>>
+                                <?= ucfirst(htmlspecialchars($origin)) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
 
-    <!-- Grille des bières -->
-    <div class=" container mx-auto p-8">
+                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                        Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <?php foreach ($beers as $beer): ?>
                 <div class="bg-stone-500/80 rounded-xl p-4">
@@ -199,7 +287,7 @@ Cordialement,`);
                             </div>
                             <!-- ORIGINE -->
                             <p class="text-gray-600 text-sm mb-2">
-                                Origine: <span class="font-medium"><?= htmlspecialchars($beer['origin']) ?></span>
+                                Origine: <span class="font-medium"><?= ucfirst(htmlspecialchars($beer['origin'])) ?></span>
                             </p>
                             <!-- DESCRIPTION -->
                             <p class="text-gray-700 text-sm h-20 line-clamp-4">
@@ -208,7 +296,7 @@ Cordialement,`);
 
                             <!-- Action Buttons -->
                             <div class="mt-4 flex justify-between items-center">
-                                <a href="./info_beer.php?id=<?= htmlspecialchars($beer['id']) ?>" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors">
+                                <a href="./info_beer_comment.php?id=<?= htmlspecialchars($beer['id']) ?>" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors">
                                     Voir détails
                                 </a>
                                 <div class="flex items-center gap-2">
@@ -217,7 +305,7 @@ Cordialement,`);
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                         </svg>
                                     </button>
-                                    <button class="text-gray-600 hover:text-amber-500">
+                                    <button class="text-gray-600 hover:text-amber-500" onclick="partager()">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
                                         </svg>
@@ -229,6 +317,41 @@ Cordialement,`);
                 </div>
             <?php endforeach; ?>
         </div>
+
+        <!-- Pagination améliorée -->
+        <?php if ($total_pages > 1): ?>
+            <div class="mt-12 bg-black/30 backdrop-blur-sm rounded-xl p-6">
+                <div class="flex flex-col items-center gap-4">
+                    <h3 class="text-white text-xl">Navigation</h3>
+                    <div class="flex flex-wrap justify-center items-center gap-2">
+                        <!-- Première page -->
+                        <?php if ($current_page > 1): ?>
+                            <a href="?page=1" class="px-4 py-2 bg-amber-500/80 text-white rounded-lg hover:bg-amber-600">
+                                Première
+                            </a>
+                        <?php endif; ?>
+
+                        <!-- Pages numérotées -->
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <a href="?page=<?= $i ?>"
+                                class="px-4 py-2 <?= $i === $current_page ? 'bg-amber-600' : 'bg-amber-500/80 hover:bg-amber-600' ?> text-white rounded-lg">
+                                <?= $i ?>
+                            </a>
+                        <?php endfor; ?>
+
+                        <!-- Dernière page -->
+                        <?php if ($current_page < $total_pages): ?>
+                            <a href="?page=<?= $total_pages ?>" class="px-4 py-2 bg-amber-500/80 text-white rounded-lg hover:bg-amber-600">
+                                Dernière
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    <p class="text-white text-sm">
+                        Page <?= $current_page ?> sur <?= $total_pages ?> (<?= $total_beers ?> bières)
+                    </p>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </body>
 

@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("Tous les champs sont obligatoires.");
         }
 
-        $stmt = $pdo->prepare("SELECT id, first_name, password FROM User WHERE email = :email");
+        $stmt = $pdo->prepare("SELECT id, first_name, password, role FROM User WHERE email = :email");
         $stmt->bindParam(":email", $email, PDO::PARAM_STR);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['first_name'] = $user['first_name'];
+        $_SESSION['role'] = $user['role'];
 
         // Redirection vers la page d'accueil
         header("Location: accueil.php");

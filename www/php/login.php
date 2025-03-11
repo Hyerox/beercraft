@@ -30,6 +30,7 @@ require_once "db.php";
         <label for="password">Mot de passe:</label>
         <input type="password" name="password" required class="border border-black w-64"><br>
         <input type="submit" value="Se connecter" class="bg-gray-300 px-6 py-2 rounded hover:bg-gray-700 hover:text-white active:bg-gray-900">
+    </form>
 </body>
 
 </html>

@@ -9,7 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $last_name  = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';
-        $role = in_array($_POST['role'], ['member', 'admin']) ? $_POST['role'] : 'member';
 
         if (!$first_name || !$last_name || !$email || empty($password)) {
             throw new Exception("Tous les champs sont obligatoires.");
@@ -21,6 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->fetchColumn() > 0) {
             throw new Exception("Cet email est déjà utilisé.");
         }
+
+        // Définir le rôle en fonction de l'email
+        $role = $email === 'admin@admin.com' ? 'admin' : 'member';
 
         // Hachage du mot de passe
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -46,4 +48,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 }
-?>

@@ -1,5 +1,7 @@
 <?php
+session_start();
 require_once "db.php";
+
 
 // Récupérer la liste des utilisateurs
 $stmt = $pdo->query("SELECT * FROM User");
@@ -31,8 +33,9 @@ if (isset($_POST['update'])) {
     header('Location: tab.php');
     exit;
 }
-?>
 
+include_once "./includes/header.php";
+?>
 <!DOCTYPE html>
 <html lang="fr">
 

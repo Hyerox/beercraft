@@ -1,17 +1,16 @@
 <?php
-
 session_start();
 require_once "db.php";
-include_once "./includes/header.php";
 
-// Vérification si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-  header('Location: login.php');
+// Vérification du rôle uniquement si l'utilisateur est connecté
+if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'member') {
+  $_SESSION['error'] = "Vous n'avez pas les droits pour ajouter une bière";
+  header('Location: accueil.php');
   exit;
 }
 
+include_once "./includes/header.php";
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -53,51 +52,60 @@ if (!isset($_SESSION['user_id'])) {
       <div class="w-full lg:w-1/2">
         <div class="bg-black/30 backdrop-blur-sm text-white rounded-xl p-8">
           <h3 class="text-3xl font-bold mb-8 text-center">Ajouter une bière</h3>
-          <form action="add_beer_traitement.php" method="post" class="space-y-6">
-            <!-- Image URL -->
-            <div class="space-y-2">
-              <label for="image" class="block text-lg">URL de l'image</label>
-              <input type="text" id="image" name="image" class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="https://..." oninput="updatePreview()">
-            </div>
-
-            <!-- Nom de la bière -->
-            <div class="space-y-2">
-              <label for="beer_name" class="block text-lg">Nom de la bière</label>
-              <input type="text" id="beer_name" name="beer_name" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
-            </div>
-
-            <!-- Origine -->
-            <div class="space-y-2">
-              <label for="origin" class="block text-lg">Origine</label>
-              <input type="text" id="origin" name="origin" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
-            </div>
-
-            <div class="flex gap-4">
-              <!-- Alcool -->
-              <div class="space-y-2 w-1/2">
-                <label for="alcohol" class="block text-lg">% Alcool</label>
-                <input type="number" step=".1" min="0" max="67" id="alcohol" name="alcohol" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
-              </div>
-
-              <!-- Prix -->
-              <div class="space-y-2 w-1/2">
-                <label for="price" class="block text-lg">Prix</label>
-                <input type="number" step=".01" min="0" id="price" name="price" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
+          <?php if (!isset($_SESSION['user_id'])): ?>
+            <div class="bg-red-500/80 text-white p-4 rounded-lg mb-6">
+              <p class="text-center">Vous devez être connecté pour ajouter une bière.</p>
+              <div class="flex justify-center mt-4">
+                <a href="login.php" class="bg-white text-red-500 px-6 py-2 rounded-lg hover:bg-gray-100">Se connecter</a>
               </div>
             </div>
+          <?php else: ?>
+            <form action="add_beer_traitement.php" method="post" class="space-y-6">
+              <!-- Image URL -->
+              <div class="space-y-2">
+                <label for="image" class="block text-lg">URL de l'image</label>
+                <input type="text" id="image" name="image" class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="https://..." oninput="updatePreview()">
+              </div>
 
-            <!-- Description -->
-            <div class="space-y-2">
-              <label for="description" class="block text-lg">Description</label>
-              <textarea id="description" name="description" rows="5" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="Décrivez cette bière..." oninput="updatePreview()"></textarea>
-            </div>
+              <!-- Nom de la bière -->
+              <div class="space-y-2">
+                <label for="beer_name" class="block text-lg">Nom de la bière</label>
+                <input type="text" id="beer_name" name="beer_name" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
+              </div>
 
-            <div class="flex justify-center pt-4">
-              <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-amber-500/50">
-                Ajouter la bière
-              </button>
-            </div>
-          </form>
+              <!-- Origine -->
+              <div class="space-y-2">
+                <label for="origin" class="block text-lg">Origine</label>
+                <input type="text" id="origin" name="origin" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
+              </div>
+
+              <div class="flex gap-4">
+                <!-- Alcool -->
+                <div class="space-y-2 w-1/2">
+                  <label for="alcohol" class="block text-lg">% Alcool</label>
+                  <input type="number" step=".1" min="0" max="67" id="alcohol" name="alcohol" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
+                </div>
+
+                <!-- Prix -->
+                <div class="space-y-2 w-1/2">
+                  <label for="price" class="block text-lg">Prix</label>
+                  <input type="number" step=".01" min="0" id="price" name="price" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" oninput="updatePreview()">
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="space-y-2">
+                <label for="description" class="block text-lg">Description</label>
+                <textarea id="description" name="description" rows="5" required class="w-full bg-white/10 border border-white/20 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="Décrivez cette bière..." oninput="updatePreview()"></textarea>
+              </div>
+
+              <div class="flex justify-center pt-4">
+                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-amber-500/50">
+                  Ajouter la bière
+                </button>
+              </div>
+            </form>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -152,6 +160,9 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
   </div>
+  <?php
+  include_once "./includes/footer.php";
+  ?>
 </body>
 
 </html>

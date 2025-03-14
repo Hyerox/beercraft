@@ -4,6 +4,8 @@ require_once "db.php";
 
 // Vérifications préalables
 if (!isset($_SESSION['user_id'])) {
+  $_SESSION['error'] = "Vous devez être connecté pour laisser un commentaire";
+  $_SESSION['redirect_url'] = "info_beer_comment.php?id=" . $_GET['beer_id'];
   header('Location: login.php');
   exit();
 }

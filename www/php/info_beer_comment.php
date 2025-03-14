@@ -1,18 +1,11 @@
 <?php
 session_start();
 require_once "db.php";
+include "./tools/tools.php";
 
 // Débogage - Afficher les informations de session
 error_log("Session user_role: " . ($_SESSION['user_role'] ?? 'non défini'));
 error_log("Session user_id: " . ($_SESSION['user_id'] ?? 'non défini'));
-
-// Vérification de l'authentification
-if (!isset($_SESSION['user_id'])) {
-  $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
-  $_SESSION['error'] = "Vous devez être connecté pour voir les détails d'une bière";
-  header('Location: login.php');
-  exit();
-}
 
 // Initialisation
 $error = $_SESSION['error'] ?? null;
@@ -72,22 +65,6 @@ $isAdmin = isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin
         input.focus();
       }, 500); // vous pouvez ajuster la durée selon vos tests
     }
-
-    function partager() {
-      if (navigator.share) {
-        navigator.share({
-          title: document.title,
-          text: "Découvrez cette page !",
-          url: window.location.href
-        }).then(() => {
-          console.log('Partage réussi');
-        }).catch((error) => {
-          console.error('Erreur de partage :', error);
-        });
-      } else {
-        alert("Le partage n'est pas pris en charge sur ce navigateur.");
-      }
-    }
   </script>
 </head>
 
@@ -132,12 +109,6 @@ $isAdmin = isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin
 
           <!-- Boutons d'action -->
           <div class="flex flex-wrap gap-4 mt-8">
-            <button class="flex items-center gap-2 bg-amber-500/80 hover:bg-amber-600 px-6 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-amber-500/50">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              J'aime
-            </button>
 
             <button onclick="comment()" class="flex items-center gap-2 bg-stone-500/80 hover:bg-stone-600 px-6 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-stone-500/50">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -169,26 +140,35 @@ $isAdmin = isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin
         </div>
       <?php endif; ?>
 
-      <!-- Formulaire de commentaire -->
-      <form method="POST" action="info_beer_comment_traitement.php?beer_id=<?= $beer['id'] ?>" class="mb-8">
-        <div class="mb-4" id="comment-section">
-          <label class="block text-white mb-2">Note :</label>
-          <select name="rating" class="rounded-lg px-3 py-2">
-            <?php for ($i = 1; $i <= 5; $i++): ?>
-              <option value="<?= $i ?>"><?= str_repeat('⭐', $i) ?></option>
-            <?php endfor; ?>
-          </select>
+      <?php if (!isset($_SESSION['user_id'])): ?>
+        <div class="bg-amber-500/80 text-white p-4 rounded-lg mb-6">
+          <p class="text-center">Vous devez être connecté pour laisser un commentaire.</p>
+          <div class="flex justify-center mt-4">
+            <a href="login.php" class="bg-white text-amber-500 px-6 py-2 rounded-lg hover:bg-gray-100">Se connecter</a>
+          </div>
         </div>
-        <textarea
-          name="content" id="comment-input"
-          required
-          class="w-full p-4 rounded-lg bg-white/90 mb-2"
-          rows="3"
-          placeholder="Laissez votre commentaire..."></textarea>
-        <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg transition-colors">
-          Envoyer
-        </button>
-      </form>
+      <?php else: ?>
+        <!-- Formulaire de commentaire -->
+        <form method="POST" action="info_beer_comment_traitement.php?beer_id=<?= $beer['id'] ?>" class="mb-8">
+          <div class="mb-4" id="comment-section">
+            <label class="block text-white mb-2">Note :</label>
+            <select name="rating" class="rounded-lg px-3 py-2">
+              <?php for ($i = 1; $i <= 5; $i++): ?>
+                <option value="<?= $i ?>"><?= str_repeat('⭐', $i) ?></option>
+              <?php endfor; ?>
+            </select>
+          </div>
+          <textarea
+            name="content" id="comment-input"
+            required
+            class="w-full p-4 rounded-lg bg-white/90 mb-2"
+            rows="3"
+            placeholder="Laissez votre commentaire..."></textarea>
+          <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg transition-colors">
+            Envoyer
+          </button>
+        </form>
+      <?php endif; ?>
 
       <!-- Liste des commentaires -->
       <div class="space-y-4">
@@ -210,7 +190,7 @@ $isAdmin = isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin
                   </span>
                 </div>
                 <div class="flex justify-end">
-                  <?php if ($isAdmin || ($comment['user_id'] == $_SESSION['user_id'])): ?>
+                  <?php if ($isAdmin || (isset($comment['user_id']) && isset($_SESSION['user_id']) && $comment['user_id'] == $_SESSION['user_id'])): ?>
                     <form method="POST" action="info_beer_comment_traitement.php?beer_id=<?= $beer['id'] ?>"
                       onsubmit="return confirm('<?= $isAdmin ? 'Administrateur: ' : '' ?>Voulez-vous vraiment supprimer ce commentaire ?');">
                       <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">

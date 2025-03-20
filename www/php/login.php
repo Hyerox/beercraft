@@ -12,6 +12,7 @@ require_once "db.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Connexion - BeerCraft</title>
 </head>
@@ -29,7 +30,7 @@ require_once "db.php";
             </div>
         <?php endif; ?>
 
-        <form action="login_traitement.php" method="post" class="space-y-6">
+        <form action="login_traitement.php" method="post" class="space-y-6" accept-charset="UTF-8">
             <div class="space-y-2">
                 <label for="email" class="block text-white">Email</label>
                 <input type="email" id="email" name="email" required

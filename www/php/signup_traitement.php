@@ -1,13 +1,16 @@
 <?php
 session_start();
-
 require_once "db.php";
+
+mb_internal_encoding('UTF-8');
+header('Content-Type: text/html; charset=utf-8');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
-        $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $last_name  = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+        // Nettoyage et encodage des données en UTF-8
+        $first_name = mb_convert_encoding(trim($_POST['first_name']), 'UTF-8', mb_detect_encoding($_POST['first_name']));
+        $last_name = mb_convert_encoding(trim($_POST['last_name']), 'UTF-8', mb_detect_encoding($_POST['last_name']));
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
 
         if (!$first_name || !$last_name || !$email || empty($password)) {
@@ -43,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     } catch (Exception $e) {
         // Utiliser une variable de session pour afficher le message d'erreur sur la page d'inscription
-        $_SESSION['error'] = "Erreur : " . $e->getMessage();
+        $_SESSION['error'] = "Erreur : " . mb_convert_encoding($e->getMessage(), 'UTF-8');
         header("Location: signup.php");
         exit;
     }

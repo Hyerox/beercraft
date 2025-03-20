@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "db.php";
+include "./tools/tools.php";
 
 // Vérification du rôle uniquement si l'utilisateur est connecté
 if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'member') {
@@ -19,30 +20,7 @@ include_once "./includes/header.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   <title>Ajout de bière</title>
-  <script>
-    function capitalizeFirstLetter(string) {
-      if (!string) return '-';
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
 
-    function updatePreview() {
-      // Image preview
-      let imageUrl = document.getElementById('image').value;
-      let imagePreview = document.getElementById('preview_image');
-      imagePreview.src = imageUrl || 'https://via.placeholder.com/400x300?text=Image+de+la+bière';
-      imagePreview.style.display = 'block';
-
-      // Text content preview
-      document.getElementById('preview_name').innerText = capitalizeFirstLetter(document.getElementById('beer_name').value) || '-';
-      document.getElementById('preview_origin').innerText = capitalizeFirstLetter(document.getElementById('origin').value) || '-';
-      document.getElementById('preview_alcohol').innerText = (document.getElementById('alcohol').value || '-') + '%';
-      document.getElementById('preview_description').innerText = capitalizeFirstLetter(document.getElementById('description').value) || '-';
-      document.getElementById('preview_price').innerText = (document.getElementById('price').value || '-') + '€';
-    }
-
-    // Initialiser la prévisualisation au chargement
-    window.onload = updatePreview;
-  </script>
 </head>
 
 <body style="background-image: url('../images/beer_bg.jpg');" class="bg-cover bg-center min-h-screen bg-fixed">
@@ -142,14 +120,9 @@ include_once "./includes/header.php";
                   Voir détails
                 </button>
                 <div class="flex items-center gap-2">
-                  <button class="text-gray-600 hover:text-amber-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
-                  <button class="text-gray-600 hover:text-amber-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                  <button class="text-gray-600 hover:text-amber-500" onclick="partager()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                     </svg>
                   </button>
                 </div>

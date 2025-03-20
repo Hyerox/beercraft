@@ -9,6 +9,7 @@ require_once "db.php";
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Inscription - BeerCraft</title>
@@ -27,7 +28,7 @@ require_once "db.php";
             </div>
         <?php endif; ?>
 
-        <form method="post" action="signup_traitement.php" class="space-y-6">
+        <form method="post" action="signup_traitement.php" class="space-y-6" accept-charset="UTF-8">
             <div class="space-y-2">
                 <label for="first_name" class="block text-white">Prénom</label>
                 <input type="text" id="first_name" name="first_name" required

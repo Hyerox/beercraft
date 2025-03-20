@@ -12,7 +12,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
       <!-- Logo et titre -->
       <div class="flex items-center gap-4 w-1/3">
         <a href="./accueil.php" class="flex items-center gap-2">
-          <img src="../images/Logo-beercraft-removebg-preview.png" alt="Logo Beercraft" class="w-16 h-16 object-contain">
+          <img src="../images/Logo-beercraft-removebg-preview.png" alt="Logo Beercraft" class="w-16 h-16 object-contain" width="50">
         </a>
       </div>
 
@@ -40,7 +40,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <?php else: ?>
 
             <?php endif; ?>
-            <!-- FIXME ENLEVER BOUTON CREATION POUR MEMBRE -->
             <a href="./logout.php" class="bg-red-500/80 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors">
               Déconnexion
             </a>

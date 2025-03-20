@@ -4,10 +4,17 @@ session_start();
 
 require_once "db.php";
 
+// Définir l'encodage des caractères en UTF-8
+mb_internal_encoding('UTF-8');
+header('Content-Type: text/html; charset=utf-8');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
-        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
+
+        // Conversion explicite en UTF-8 si nécessaire
+        $email = mb_convert_encoding($email, 'UTF-8', mb_detect_encoding($email));
 
         if (!$email || empty($password)) {
             throw new Exception("Tous les champs sont obligatoires.");
@@ -31,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     } catch (Exception $e) {
         // Utiliser une variable de session pour afficher le message d'erreur sur la page de connexion
-        $_SESSION['error'] = "Erreur : " . $e->getMessage();
+        $_SESSION['error'] = "Erreur : " . mb_convert_encoding($e->getMessage(), 'UTF-8');
         header("Location: login.php");
         exit;
     }

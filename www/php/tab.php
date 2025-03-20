@@ -2,6 +2,12 @@
 session_start();
 require_once "db.php";
 
+// Vérification stricte des droits d'accès
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+
+    header('Location: accueil.php');
+    exit;
+}
 
 // Récupérer la liste des utilisateurs
 $stmt = $pdo->query("SELECT * FROM User");

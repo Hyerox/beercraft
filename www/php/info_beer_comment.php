@@ -51,21 +51,6 @@ $isAdmin = isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <title><?= ucfirst(htmlspecialchars($beer['name'])) ?></title>
-  <script>
-    function comment() {
-      const section = document.getElementById('comment-section');
-      const input = document.getElementById('comment-input');
-
-      section.scrollIntoView({
-        behavior: 'smooth'
-      });
-
-      // Focus sur le champ après un court délai pour laisser le scroll se terminer
-      setTimeout(() => {
-        input.focus();
-      }, 500); // vous pouvez ajuster la durée selon vos tests
-    }
-  </script>
 </head>
 
 <body style="background-image: url('../../images/beer_bg.jpg');" class="bg-cover bg-center min-h-screen bg-fixed">

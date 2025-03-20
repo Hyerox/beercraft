@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "db.php";
+include "./tools/tools.php";
 
 
 if (!isset($_SESSION['user_id'])) {
@@ -39,30 +40,6 @@ include_once "./includes/header.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   <title>Modifier la bière</title>
-  <script>
-    function updatePreview() {
-      // Même fonction que dans add_beer.php
-      document.getElementById('preview_name').innerText = capitalizeFirstLetter(document.getElementById('beer_name').value);
-      document.getElementById('preview_origin').innerText = capitalizeFirstLetter(document.getElementById('origin').value);
-      document.getElementById('preview_alcohol').innerText = document.getElementById('alcohol').value + '%';
-      document.getElementById('preview_description').innerText = capitalizeFirstLetter(document.getElementById('description').value);
-      document.getElementById('preview_price').innerText = document.getElementById('price').value + '€';
-
-      let imageUrl = document.getElementById('image').value;
-      let imagePreview = document.getElementById('preview_image');
-      if (imageUrl) {
-        imagePreview.src = imageUrl;
-        imagePreview.style.display = 'block';
-      } else {
-        imagePreview.src = "";
-        imagePreview.style.display = 'none';
-      }
-    }
-
-    function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-  </script>
 </head>
 
 <body style="background-image: url('../images/beer_bg.jpg');" class="bg-cover bg-center h-screen bg-fixed">
@@ -177,12 +154,6 @@ include_once "./includes/header.php";
       </div>
     </div>
   </div>
-  <script>
-    // Initialiser la prévisualisation au chargement
-    window.onload = function() {
-      updatePreview();
-    };
-  </script>
   <?php
   include_once "./includes/footer.php";
   ?>

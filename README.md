@@ -1,66 +1,78 @@
-# 🍺 BeerCraft
+# Beercraft 🍺
 
-BeerCraft is a vibrant community-driven platform where beer enthusiasts can discover, rate, and discuss their favorite beers. Built with modern web technologies, it offers a seamless experience for both casual users and dedicated beer connoisseurs.
+## Description
 
-![BeerCraft Preview](/www/images/accueil.png)
+Beercraft est une application web permettant de gérer et découvrir différentes bières artisanales. Elle offre une interface pour consulter, ajouter et gérer une collection de bières.
 
-## 📋 Overview
+## Fonctionnalités
 
-BeerCraft allows users to:
+- Catalogue de bières artisanales
+- Système d'authentification utilisateur
+- Gestion des bières (CRUD)
+- Interface responsive
+- Système de notation et commentaires
 
-- Browse an extensive catalog of beers from around the world
-- View detailed information about each beer
-- Share thoughts and ratings through a commenting system
-- Filter beers by origin
-- Share favorite beers on social media
-- Manage their user profile
+## Technologies utilisées
 
-## 🌟 Key Features
+- PHP
+- MySQL
+- HTML5/CSS3
+- JavaScript
+- Bootstrap
 
-### For Visitors
+## Prérequis
 
-- **Browse Beers**: Explore our comprehensive beer catalog
-- **Search & Filter**: Find beers by origin or type
-- **View Details**: Access detailed information about each beer
-- **Responsive Design**: Enjoy a seamless experience on any device
+- PHP 7.4 ou supérieur
+- MySQL 5.7 ou supérieur
+- Serveur web (Apache)
 
-### For Members
+## Installation
 
-- **Personal Account**: Create and manage your profile
-- **Interactive Features**: Rate and comment on beers
-- **Social Sharing**: Share favorite beers with friends
+1. Clonez le repository
 
-### For Administrators
+```bash
+git clone https://github.com/yourusername/beercraft.git
+cd beercraft
+```
 
-- **Content Management**: Add, edit, or remove beers
-- **User Management**: Manage user accounts and roles
-- **Comment Moderation**: Monitor and moderate user comments
-- **Analytics Dashboard**: Track user engagement and popular beers
+2. Installez les dépendances
 
-## 🛠 Technical Details
+```bash
+composer install
+```
 
-### Technology Stack
+3. Configurez l'environnement
+   Copiez le fichier `.env.example` en `.env` et modifiez les paramètres de configuration nécessaires.
 
-- **Frontend**:
+4. Générez la clé de l'application
 
-  - HTML5
-  - TailwindCSS for modern, responsive styling
-  - JavaScript for interactive features
-  - Mobile-first approach
+```bash
+php artisan key:generate
+```
 
-- **Backend**:
+5. Exécutez les migrations de base de données
 
-  - PHP 8.2
-  - MySQL 8.0 for data persistence
-  - PDO for secure database operations
-  - Session-based authentication
+```bash
+php artisan migrate
+```
 
-- **Development Environment**:
-  - Docker & Docker Compose
-  - PHPMyAdmin for database management
-  - Git for version control
+6. Démarrez le serveur de développement
 
-### Security Features
+```bash
+php artisan serve
+```
+
+## Utilisation
+
+Accédez à l'application via `http://localhost:8000` et commencez à explorer les différentes fonctionnalités de Beercraft.
+
+## Contribuer
+
+Les contributions sont les bienvenues ! Veuillez suivre les étapes ci-dessous pour contribuer :
+
+1. Forkez le repository
+2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Commitez vos modifications (`git commit -m 'Add some AmazingFeature'`)
 
 - Password hashing
 - Input sanitization
@@ -114,7 +126,6 @@ docker exec -i mysql_container mysql -uroot -proot mydb < table.sql
 
 - All visitor features
 - Comment on beers
-- Rate beers
 - Share beers
 
 ### Administrator
@@ -162,4 +173,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Made with ❤️ by BeerCraft Team
+Made by Hyerox

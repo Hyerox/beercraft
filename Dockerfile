@@ -1,15 +1,17 @@
+# Use official PHP + Apache image
 FROM php:8.2-apache
 
-# Copie le dossier www dans le dossier web d'Apache
-COPY www/ /var/www/html/
-
-# Installe les extensions PHP nécessaires (optionnel)
-RUN docker-php-ext-install mysqli pdo pdo_mysql
-
-# Active mod_rewrite (utile si tu fais des routes dynamiques)
+# Enable rewrite module
 RUN a2enmod rewrite
 
-# Expose le port 80
-EXPOSE 80
+# Copy your app into Apache’s root directory
+COPY ./www /var/www/html/
 
-CMD ["apache2-foreground"]
+# Optional: set working directory
+WORKDIR /var/www/html
+
+# Fix permissions (optional but good practice)
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose web port
+EXPOSE 80

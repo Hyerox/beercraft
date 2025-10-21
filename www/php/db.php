@@ -1,25 +1,26 @@
 <?php
 // Connexion à la base de données
-$host = 'mysql';
-$dbname = 'mydb';
-$username = 'root';
-$password = 'root';
-
+$host = getenv('DB_HOST') ?: 'mysql';
+$port = getenv('DB_PORT') ?: '3306';
+$dbname = getenv('DB_NAME') ?: 'mydb';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASSWORD') ?: 'root';
 
 try {
-    $pdo = new PDO(
-        "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
-        $username,
-        $password,
-        [
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
-        ]
-    );
+    $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $dbname);
+
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ];
+
+    if (defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
+        $options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci';
+    }
+
+    $pdo = new PDO($dsn, $username, $password, $options);
 } catch (PDOException $e) {
-    error_log("Erreur de connexion à la base de données: " . $e->getMessage());
-    die("Erreur de connexion à la base de données");
+    error_log('Erreur de connexion à la base de données: ' . $e->getMessage());
+    die('Erreur de connexion à la base de données');
 }
 
 // Récupération des données

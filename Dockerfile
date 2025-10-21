@@ -5,7 +5,7 @@ FROM php:8.2-apache
 RUN a2enmod rewrite
 
 # Copy your app into Apache’s root directory
-COPY ./www /var/www/html/
+COPY ./www/ /var/www/html
 
 # Optional: set working directory
 WORKDIR /var/www/html

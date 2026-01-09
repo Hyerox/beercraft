@@ -163,7 +163,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Issue Tracker: GitHub Issues
 - Email: beercraft@outlook.com
-- Website: [www.beercraft.com](https://www.beercraft.com)
+- Website: https://beercraft.onrender.com
 
 ## 🙏 Acknowledgments
 
